@@ -1,0 +1,22 @@
+{
+  "batch": "QL-R17",
+  "revisions": {
+    "linked": {"station": "ql-main", "channel": "blend", "A": [["1/2", 0], [0, 2]], "C": [1, 1], "base": [0, 0], "directions": [[1, 1]]},
+    "independent": {"station": "ql-main", "channel": "blend", "parent": "linked", "A": [["1/2", 0], [0, 2]], "C": [1, 1], "base": [0, 0], "directions": [[1, 0], [0, 1]]},
+    "decaying": {"station": "ql-main", "channel": "decay", "A": [["1/2"]], "C": [1], "base": [0], "directions": [[1]]},
+    "zero": {"station": "ql-ref", "channel": "zero", "A": [], "C": [], "base": [], "directions": []},
+    "growth-main": {"station": "ql-main", "channel": "grow", "A": [[2]], "C": [1], "base": [0], "directions": [[1]]},
+    "growth-ref": {"station": "ql-ref", "channel": "grow", "A": [[2]], "C": [1], "base": [0], "directions": [[1]]},
+    "late-growing": {"station": "ql-main", "channel": "late", "A": [[2, 1, 0, 0], [0, 2, 1, 0], [0, 0, 2, 1], [0, 0, 0, 2]], "C": [1, 0, 0, 0], "base": [0, 0, 0, 1], "directions": []},
+    "late-pulse": {"station": "ql-ref", "channel": "late", "A": [[0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1], [0, 0, 0, 0]], "C": [1, 0, 0, 0], "base": [0, 0, 0, 1], "directions": []}
+  },
+  "reviews": [
+    {"case": "linked-amplitudes", "pair": ["linked", "zero"], "observations": [[0, 2]], "status": "all_divergent"},
+    {"case": "decaying-chain", "pair": ["decaying", "zero"], "observations": [[0, 2]], "status": "all_finite"},
+    {"case": "independent-amplitudes", "pair": ["independent", "zero"], "observations": [[0, 2]], "status": "mixed", "example_finite": [["2", "1", "1/2", "1/4"], ["0", "0", "0", "0"]], "example_divergent": [["2", "4", "8", "16"], ["0", "0", "0", "0"]]},
+    {"case": "cross-chain-cancellation", "pair": ["growth-main", "growth-ref"], "observations": [[0, 0]], "status": "all_finite"},
+    {"case": "incompatible-picks", "pair": ["growth-main", "growth-ref"], "observations": [[1, 1], [0, 0]], "status": "inconsistent"},
+    {"case": "same-prefix-different-tail", "pair": ["late-growing", "late-pulse"], "observations": [[0, 0], [1, 0], [2, 0], [3, 0]], "status": "all_divergent"},
+    {"case": "zero-root-transient", "pair": ["late-pulse", "zero"], "observations": [[0, 0], [3, 1], [7, 0]], "status": "all_finite"}
+  ]
+}
