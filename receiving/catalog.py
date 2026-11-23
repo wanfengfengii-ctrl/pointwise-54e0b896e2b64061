@@ -1,7 +1,6 @@
 import json
 import sqlite3
 
-from exchange.envelope import V1Packet
 from exchange.provenance import decode_origin, encode_origin
 from receiving.receipt import Receipt, ReceiptOrigin
 
@@ -30,7 +29,7 @@ class ReceiptCatalog:
     def close(self):
         self.connection.close()
 
-    def store_validated(self, wire: bytes, packet: V1Packet) -> int:
+    def store_validated(self, wire: bytes, packet) -> int:
         origin = json.dumps(encode_origin(packet.origin), sort_keys=True, ensure_ascii=False)
         with self.connection:
             self.connection.execute('''

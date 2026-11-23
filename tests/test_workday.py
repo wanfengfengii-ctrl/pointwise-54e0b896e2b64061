@@ -2,7 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from demo import run_workday
+from demo import run_restart, run_workday
 from exchange.issued_catalog import IssuedCatalog
 from reports.history import read_report
 from station.revisions import read_revision
@@ -48,6 +48,25 @@ class WorkdayTests(LabCase):
             station.close()
             receipts.close()
             reports.close()
+
+
+    def test_restart_demo_reopens_and_reclaims(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = run_restart(Path(directory))
+        expected = {
+            'linked-amplitudes': 'all_divergent',
+            'decaying-chain': 'all_finite',
+            'independent-amplitudes': 'mixed',
+            'cross-chain-cancellation': 'all_finite',
+            'incompatible-picks': 'inconsistent',
+            'same-prefix-different-tail': 'all_divergent',
+            'zero-root-transient': 'all_finite',
+        }
+        self.assertEqual({item['case']: item['status'] for item in result['statuses']}, expected)
+        self.assertTrue(result['reopened'])
+        self.assertEqual(result['mixed']['case'], 'independent-amplitudes')
+        self.assertEqual(len(result['mixed']['finite_witness']), 2)
+        self.assertEqual(len(result['mixed']['divergent_witness']), 2)
 
 
 if __name__ == '__main__':

@@ -42,3 +42,16 @@ V1 为规范 UTF-8 JSON 字节。外层含 `version`、`issue_id`、`origin`、`
 `body` 中 `direct` 为第零拍，`numerator` 和 `denominator` 由低到高按 q 的次数存储尾序列有理式，常数项对应第一拍。分母常数为 1，零尾为 `["0"]/["1"]`。有理数用约化后的整数字符串或分子/分母字符串。第 k≥1 拍为 C A^(k−1) B。中心同拍相减并约分，按剩余动态判定全拍平方和。平方和按归一响应幅值的平方计，门槛采用相同口径。
 
 有限能量是 `Fraction`，发散在报告中使用 `energy=None` 和 `energy_status='divergent'`。有限值小于或等于门槛放行。复检签稿保全原门槛和顺序，领取和补测清单只读取已签事实。回归还核对折半尾能量 4/3、有限零、重复单位模部分相消、延迟尾、同件复投、混批、提交回滚和重开。
+
+## 复电自由响应（V2）
+
+同一修订可另发一份 V2 复电件，供关站后按自由响应复核；V1 脉冲入口、原件、定稿和补测保持不变。
+
+- `exchange.issue.issue_restart(station, issued, revision_id, base, directions)` 冻结该修订的有理初态基点和方向表后签发 V2 件，返回带 `.wire`/`.credential` 的发行件，并记下 `base`/`directions`。允许初态为 `base + Σ u_i·direction_i`；`B`、`D` 不参与，响应自第零拍按 `C A^k x` 计。发行时校验 `A` 的特征根只落于 0、1/2、1、2，重根照计。
+- 同一修订的 V1 与 V2 发行号不同（V2 以 `:v2` 结尾），可并存；`receiving.intake.accept` 接纳两版。原许可重发返回原字节与原凭据，改基点或方向须按 `revise` 的父版约定另冻修订，冲突拒收。
+- V2 外层仍为规范 UTF-8 JSON（`version=2`、`issue_id`、`origin`、`body`、`digest`），摘要覆盖 `body`。`body` 只携带由许可和模型导出的公开响应证据：`parameters`、`base` 与 `directions`，每项与 V1 同构（`direct` 为第零拍，`numerator`/`denominator` 自第一拍起）。初态坐标、私有状态名、模型矩阵与向量、拓扑和原测均留在站库。
+- `review.request.RestartRequest(batch, primary_receipt, reference_receipt, observations)` 与 `compare_restart(receipts, reports, request)` 办理复电复核。`observations` 为非空的 `(拍号, 差值)` 列表或元组，按主件减对照件记；拍号互异非负、可乱序，差值沿用有理数约定。两号须同批且为 V2，可同一号。
+- 每一路各选一个本件允许的初态解释整表，按整份差分的平方可和性判定。`compare_restart` 返回 `report_id`、`batch`、升序 `observations`、`status`、`finite_witness`、`divergent_witness`、`sources`；`status` 为 `inconsistent`、`all_finite`、`all_divergent` 或 `mixed`。`mixed` 的两见证各为 `(主件前四拍, 对照件前四拍)` 四元 `Fraction` 元组，零照记；其余状态两项为 `None`。
+- `reports.history.read_restart_report(reports, report_id)` 只读已签存值，提交失败可重办，拒办或写入失败无新增。未知号报 `KeyError`，非法或冲突来件报 `ValueError`。
+
+`samples/restart.json` 的 `reviews` 给出七组预期状态，`restart_fixture.py` 另跑这批输入的 V2 对照；`demo.py` 演示关站签发、关闭实收库后重开报告库复领。

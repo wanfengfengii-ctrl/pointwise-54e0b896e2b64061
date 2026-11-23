@@ -21,6 +21,10 @@ def issue_identity(origin: IssueOrigin) -> str:
     return f'{origin.station_id}:{origin.revision_id}'
 
 
+def issue_identity_v2(origin: IssueOrigin) -> str:
+    return f'{origin.station_id}:{origin.revision_id}:v2'
+
+
 def encode_origin(origin: IssueOrigin) -> dict:
     return {
         'station_id': origin.station_id,
